@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body id="body" onload="loadGame()">
+<form>  
+<!-- ------------------------- ingreso de palabra -------------------------- -->
+ <fieldset id="fieldsetIngresar">
+<p><label id="labelPalabraAdivinar">Para comenzar a jugar ingresa una palabra:</label></p>
+<input type="password" name="palabraIngresada" id="palabraIngresada">
+<button type="reset" id="bingresar">Ingresar</button>
+</fieldset>
+<!-- ------------------------------ el array ------------------------------- -->
+<div id="desboard" class:"div"> </div>
+<!-- --------------------------- Estado de juego --------------------------- -->
+<fieldset id="fieldsetAdivinar">
+<div class:"div">
+
+        <span id="state"></span>
+        <script src="js/script.js"></script>
+<!-- --------------------------- ingresar letra ---------------------------- -->
+        <p><label id="labelHowPlay">Ingresa 1 letra ¡a ver si adivinas!:</label></p>    
+        <input type="text" name="" id="letra" maxlength="1">
+        <button type="reset" id="play">Go!</button>
+</div>
+<!-- -------------------------- cantidad de vidas -------------------------- -->
+<div class:"div" >
+    <span id="life"></span>
+</div>
+</fieldset>
+<div class:"div" >
+    <button onclick="function loadGame()" id="reload" name="reload"><black> Volvemos a jugar?</div>
+</div>
+</form>  
+<script>
+    //elementos de HTML
+    let elLife = document.getElementById ("life")
+    let elDesboard = document.getElementById ("desboard")
+    let elState = document.getElementById ("state")
+    let elLetra = document.getElementById ("letra")
+    let elPlay = document.getElementById ("play")
+    let elPalabraIngresada = document.getElementById ("palabraIngresada")
+    let elBingresar = document.getElementById ("bingresar")
+    
+
+    //Variables del juego
+let listaDeLetrasJugadas = []
+let palabraBuscada = ""
+let palabraParaCompletar = []
+let vida = 6 
+let isGameOver = false
+
+
+function loadGame(){
+        elLife.textContent = `Tenes ${vida} vida/s`
+        elDesboard.textContent = palabraParaCompletar
+}
+
+    elBingresar.addEventListener("click", function(){
+        palabraBuscada = elPalabraIngresada.value
+        palabraBuscadaConvertidaEnArray = splintearPalabraIngresada(palabraBuscada);
+        palabraParaCompletar = crearArrayVacia(palabraBuscadaConvertidaEnArray)
+        elDesboard.textContent = palabraParaCompletar
+        document.getElementById("fieldsetAdivinar").style.display = `block`
+        document.getElementById("fieldsetIngresar").style.display = `none`
+    })
+
+    
+    
+    function splintearPalabraIngresada(palabraBuscada){
+        let arrayPalabraIngresada = palabraBuscada.split('');
+        return arrayPalabraIngresada
+    }
+
+    function crearArrayVacia(palabraBuscadaConvertidaEnArray){
+        const arrayVacia = [...palabraBuscadaConvertidaEnArray]
+        arrayVacia.fill(`_`)
+        console.log(` que es esooooo ${arrayVacia} `)
+        return arrayVacia
+    }
+
+
+    elPlay.addEventListener("click", function(){
+        if (isGameOver === false) {// no termino el juego
+            //necesito obtener la letra en el INPUT
+            let letraIngresada = elLetra.value
+            console.log(`La letra ingresada fue ${letraIngresada}` )
+            //ver si esta o no en la lista de letras ya jugadas
+            if(false === perteneceALaPalabraBuscada(listaDeLetrasJugadas, letraIngresada)){ //si no fue jugada antes la letra, la agrego a la lista de letras jugadas
+                listaDeLetrasJugadas.push(letraIngresada)
+                //ver si perteneceALaPalabraBuscada la letra a la palabra buscada
+                if(perteneceALaPalabraBuscada(palabraBuscadaConvertidaEnArray, letraIngresada) === true){ //si la letra perteneceALaPalabraBuscada 
+                    palabraParaCompletar = reemplazarLetraEnArray(palabraParaCompletar, palabraBuscada, letraIngresada )
+                    elDesboard.textContent = palabraParaCompletar
+                }else{ // si la letra no peretenece pierde vida
+                    vida--
+                    console.log(vida)
+                    elLife.textContent = ` Tenes ${vida} vida/s`
+                }
+            } else{ //si ya jugo la letra, pierde una vida
+                vida--
+                console.log(vida)
+                elLife.textContent = ` Tenes ${vida} vida/s`
+            }
+        }
+        
+        if (juegoTerminado(palabraParaCompletar, palabraBuscada ) === true){
+            //GANASTE
+            console.log("Ganaste!")
+            isGameOver = true
+            elState.textContent = "GANASTE! 😎"
+            document.getElementById("state").style.color="white"
+            elDesboard.textContent = `✨${palabraBuscada}✨`
+            document.getElementById("reload").style.display = `block`
+        }
+        if (vida === 0){
+            //Perdiste
+            console.log("Perdiste!")
+            isGameOver = true
+            elState.textContent = "PERDISTE 💔"
+            document.getElementById("state").style.color="white"
+            elDesboard.textContent = `La palabra era: "${palabraBuscada}" `
+            document.getElementById("reload").style.display = `block`
+            
+            
+        }
+
+    })
+
+       
+
+
+</script>
+</body>
+</html>
+
